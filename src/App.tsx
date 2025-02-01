@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
-import Preferences from "./pages/Preferences";
+// import Preferences from "./pages/Preferences";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -15,14 +15,14 @@ const App: React.FC = () => {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route
+        {/* <Route
           path="/preferences"
           element={
             <ProtectedRoute>
               <Preferences />
             </ProtectedRoute>
           }
-        />
+        /> */}
         <Route
           path="/dashboard"
           element={
