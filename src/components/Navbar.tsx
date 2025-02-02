@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { AppBar, Toolbar, Typography, Button } from "@mui/material";
+import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../services/firebase";
 import { doc, getDoc } from "firebase/firestore";
+import FriendRequests from "./FriendRequests"; // Import FriendRequests component
 
 interface NavbarProps {
   title: string;
@@ -51,17 +52,23 @@ const Navbar: React.FC<NavbarProps> = ({ title }) => {
         <Typography variant="h4" sx={{ color: "#CC0033", fontWeight: "bold" }}>
           {title}
         </Typography>
-        <div>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          {/* Friend Requests Notification */}
+          <FriendRequests />
+
+          {/* Profile Button */}
           <Button
             onClick={handleProfileClick}
             sx={{ color: "#CC0033", textTransform: "none" }}
           >
-            Hi!{username}
+            Hi! {username}
           </Button>
+
+          {/* Logout Button */}
           <Button onClick={handleLogout} sx={{ color: "#CC0033" }}>
             Logout
           </Button>
-        </div>
+        </Box>
       </Toolbar>
     </AppBar>
   );

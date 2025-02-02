@@ -7,6 +7,7 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Chat from "./components/Chat";
 
 const App: React.FC = () => {
   return (
@@ -39,6 +40,7 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
+        <Route path="/chat/:friendId" element={<Chat />} />
       </Routes>
     </Router>
   );

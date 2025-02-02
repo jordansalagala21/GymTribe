@@ -1,29 +1,93 @@
-import React, { useEffect } from "react";
-import { auth } from "../services/firebase";
+import React, { useEffect, useState } from "react";
+import { auth, db } from "../services/firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
-import { Typography, Box, Grid, Card, CardContent, Stack } from "@mui/material";
+import {
+  collection,
+  query,
+  where,
+  onSnapshot,
+  Timestamp,
+} from "firebase/firestore";
+import {
+  Typography,
+  Box,
+  Grid,
+  Card,
+  CardContent,
+  Stack,
+  Snackbar,
+  Alert,
+} from "@mui/material";
 import Navbar from "../components/Navbar";
 import GymList from "../components/GymList";
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import YourFriends from "../components/YourFriends";
 import FriendSuggestions from "../components/FriendSuggestions";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
+  const [notification, setNotification] = useState<string | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       if (!user) {
         navigate("/login");
       }
     });
-    return () => unsubscribe();
+
+    return () => unsubscribeAuth();
   }, [navigate]);
+
+  useEffect(() => {
+    const fetchMessages = () => {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      // Query messages where the user is a participant
+      const messagesQuery = query(
+        collection(db, "messages"),
+        where("chatParticipants", "array-contains", user.uid),
+        where("timestamp", ">", Timestamp.now())
+      );
+
+      const unsubscribeMessages = onSnapshot(messagesQuery, (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type === "added") {
+            const messageData = change.doc.data();
+            if (messageData.senderId !== user.uid) {
+              showNotification("You have a new message!");
+            }
+          }
+        });
+      });
+
+      return unsubscribeMessages;
+    };
+
+    const unsubscribe = fetchMessages();
+    return () => unsubscribe && unsubscribe();
+  }, []);
+
+  const showNotification = (message: string) => {
+    setNotification(message);
+    setTimeout(() => setNotification(null), 3000); // Auto-hide after 3 seconds
+  };
 
   return (
     <Box sx={{ minHeight: "100vh", backgroundColor: "#f9f9f9" }}>
       <Navbar title="R GymTribe" />
+
+      {/* Notification Snackbar */}
+      <Snackbar
+        open={!!notification}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert severity="info" sx={{ width: "100%" }}>
+          {notification}
+        </Alert>
+      </Snackbar>
 
       <Box sx={{ padding: 4 }}>
         <Typography
@@ -54,6 +118,14 @@ const Dashboard: React.FC = () => {
           </Grid>
 
           <Grid item xs={12} md={6}>
+            {/* Your Friends Section */}
+            <Card sx={{ boxShadow: 3, borderRadius: 2, marginBottom: 4 }}>
+              <CardContent>
+                <YourFriends />
+              </CardContent>
+            </Card>
+
+            {/* People You May Know Section */}
             <Card sx={{ boxShadow: 3, borderRadius: 2 }}>
               <CardContent>
                 <Stack
