@@ -11,7 +11,7 @@ import {
 import ChatIcon from "@mui/icons-material/Chat";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../services/firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs, getDoc, doc } from "firebase/firestore";
 
 interface Friend {
   id: string;
@@ -31,15 +31,17 @@ const YourFriends: React.FC = () => {
         collection(db, "friends"),
         where("user1Id", "==", user.uid)
       );
+
       const friendsSnapshot = await getDocs(friendsQuery);
 
       const friendsData = await Promise.all(
         friendsSnapshot.docs.map(async (docSnap) => {
           const friendId = docSnap.data().user2Id;
-          const friendDoc = await getDocs(collection(db, "profiles"));
-          const friendProfile = friendDoc.docs
-            .find((doc) => doc.id === friendId)
-            ?.data();
+
+          // Fetch the friend's profile
+          const friendDoc = await getDoc(doc(db, "profiles", friendId));
+          const friendProfile = friendDoc.exists() ? friendDoc.data() : {};
+
           return {
             id: friendId,
             name: friendProfile?.name || "Unknown",
@@ -47,7 +49,12 @@ const YourFriends: React.FC = () => {
         })
       );
 
-      setFriends(friendsData);
+      // Remove duplicates (in case bidirectional records exist)
+      const uniqueFriends = Array.from(
+        new Map(friendsData.map((friend) => [friend.id, friend])).values()
+      );
+
+      setFriends(uniqueFriends);
     };
 
     fetchFriends();

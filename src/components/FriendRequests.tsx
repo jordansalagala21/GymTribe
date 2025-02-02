@@ -74,17 +74,28 @@ const FriendRequests: React.FC = () => {
   };
 
   const handleAcceptRequest = async (requestId: string, senderId: string) => {
+    const user = auth.currentUser;
+    if (!user) return;
+
     // Update the request status to accepted
     await updateDoc(doc(db, "friendRequests", requestId), {
       status: "accepted",
     });
 
-    // Add to friends collection
-    await addDoc(collection(db, "friends"), {
-      user1Id: auth.currentUser?.uid,
-      user2Id: senderId,
-      createdAt: new Date(),
-    });
+    // Add mutual friendship in both directions
+    const friendsCollection = collection(db, "friends");
+    await Promise.all([
+      addDoc(friendsCollection, {
+        user1Id: user.uid,
+        user2Id: senderId,
+        createdAt: new Date(),
+      }),
+      addDoc(friendsCollection, {
+        user1Id: senderId,
+        user2Id: user.uid,
+        createdAt: new Date(),
+      }),
+    ]);
 
     // Remove from the request list
     setRequests((prev) => prev.filter((req) => req.id !== requestId));
