@@ -15,6 +15,8 @@ import {
   Stack,
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
+import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
+import SchoolIcon from "@mui/icons-material/School";
 import { auth, db } from "../services/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
@@ -38,6 +40,8 @@ const Profile: React.FC = () => {
     "CrossFit",
     "HIIT",
     "Cycling",
+    "Functional Training",
+    "Athletic Training",
   ];
 
   const gyms = [
@@ -86,10 +90,10 @@ const Profile: React.FC = () => {
   return (
     <Box
       sx={{
-        maxWidth: 600,
+        maxWidth: 800,
         margin: "auto",
         padding: 4,
-        marginTop: 10,
+        marginTop: 8,
         boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
         borderRadius: 4,
         backgroundColor: "#fff",
@@ -123,6 +127,7 @@ const Profile: React.FC = () => {
         value={name}
         onChange={(e) => setName(e.target.value)}
         margin="normal"
+        helperText="Enter your full name."
       />
 
       <TextField
@@ -132,6 +137,7 @@ const Profile: React.FC = () => {
         value={age}
         onChange={(e) => setAge(e.target.value)}
         margin="normal"
+        helperText="Enter your age in years."
       />
 
       <FormControl fullWidth sx={{ marginTop: 3 }}>
@@ -140,6 +146,7 @@ const Profile: React.FC = () => {
           value={collegeYear}
           onChange={(e) => setCollegeYear(e.target.value)}
           label="College Year"
+          startAdornment={<SchoolIcon sx={{ marginRight: 1 }} />}
         >
           {collegeYears.map((year, index) => (
             <MenuItem key={index} value={year}>
@@ -160,6 +167,7 @@ const Profile: React.FC = () => {
           value={preferredGym}
           onChange={(e) => setPreferredGym(e.target.value)}
           label="Preferred Gym"
+          startAdornment={<FitnessCenterIcon sx={{ marginRight: 1 }} />}
         >
           {gyms.map((gym, index) => (
             <MenuItem key={index} value={gym}>
