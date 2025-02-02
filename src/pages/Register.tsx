@@ -30,7 +30,7 @@ const Register: React.FC = () => {
         email,
       });
 
-      navigate("/preferences"); // Redirect to preferences after registration
+      navigate("/dashboard"); // Redirect to preferences after registration
     } catch (err) {
       setError((err as Error).message);
     }
