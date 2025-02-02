@@ -15,12 +15,17 @@ import {
   Stack,
   Snackbar,
   Alert,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import SchoolIcon from "@mui/icons-material/School";
 import { auth, db } from "../services/firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 
 const Profile: React.FC = () => {
@@ -30,6 +35,7 @@ const Profile: React.FC = () => {
   const [preferredGym, setPreferredGym] = useState("");
   const [collegeYear, setCollegeYear] = useState("");
   const [showSnackbar, setShowSnackbar] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const navigate = useNavigate();
 
@@ -85,8 +91,27 @@ const Profile: React.FC = () => {
         preferredGym,
         collegeYear,
       });
-      setShowSnackbar(true); // Show the Snackbar
-      setTimeout(() => navigate("/dashboard"), 1500); // Navigate after a delay
+      setShowSnackbar(true);
+      setTimeout(() => navigate("/dashboard"), 1500);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    const user = auth.currentUser;
+    if (user) {
+      try {
+        // Delete the user profile from Firestore
+        await deleteDoc(doc(db, "profiles", user.uid));
+
+        // Delete the user account from Firebase Auth
+        await user.delete();
+
+        // Show success message and redirect to home page
+        setShowSnackbar(true);
+        setTimeout(() => navigate("/"), 1500);
+      } catch (error) {
+        console.error("Error deleting account:", error);
+      }
     }
   };
 
@@ -219,6 +244,47 @@ const Profile: React.FC = () => {
       >
         Save Profile
       </Button>
+
+      {/* Delete Account Button */}
+      <Button
+        variant="outlined"
+        fullWidth
+        sx={{
+          marginTop: 2,
+          color: "#CC0033",
+          borderColor: "#CC0033",
+          padding: 1.5,
+          fontSize: "1rem",
+          fontWeight: "bold",
+        }}
+        onClick={() => setShowDeleteDialog(true)}
+      >
+        Delete Account
+      </Button>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={showDeleteDialog}
+        onClose={() => setShowDeleteDialog(false)}
+      >
+        <DialogTitle>Confirm Account Deletion</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete your account? This action cannot be
+            undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setShowDeleteDialog(false)}>Cancel</Button>
+          <Button
+            onClick={handleDeleteAccount}
+            color="error"
+            variant="contained"
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Snackbar Alert */}
       <Snackbar
