@@ -22,7 +22,7 @@ import Navbar from "../components/Navbar";
 import GymList from "../components/GymList";
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
-import HealthAndSafetyIcon from "@mui/icons-material/HealthAndSafety";
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import YourFriends from "../components/YourFriends";
 import FriendSuggestions from "../components/FriendSuggestions";
 import { useNavigate } from "react-router-dom";
@@ -30,10 +30,24 @@ import { useNavigate } from "react-router-dom";
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [notification, setNotification] = useState<string | null>(null);
+  const [, setUserName] = useState<string>("User");
+  const [promotions] = useState<Array<{ gym: string; offer: string }>>([
+    { gym: "College Avenue Gym", offer: "50% off annual membership!" },
+    {
+      gym: "Livingston Recreation Center",
+      offer: "Free personal training session with new signup.",
+    },
+    {
+      gym: "Sonny Werblin Recreation Center",
+      offer: "Refer a friend and get a $25 credit.",
+    },
+  ]);
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-      if (!user) {
+      if (user) {
+        setUserName(user.displayName || "User");
+      } else {
         navigate("/login");
       }
     });
@@ -46,7 +60,6 @@ const Dashboard: React.FC = () => {
       const user = auth.currentUser;
       if (!user) return;
 
-      // Query messages where the user is a participant
       const messagesQuery = query(
         collection(db, "messages"),
         where("chatParticipants", "array-contains", user.uid),
@@ -91,11 +104,12 @@ const Dashboard: React.FC = () => {
       </Snackbar>
 
       <Box sx={{ padding: 4 }}>
+        {/* Personalized Greeting */}
         <Typography
-          variant="h5"
+          variant="h4"
           sx={{ marginBottom: 4, textAlign: "center", fontWeight: "bold" }}
         >
-          Welcome to Your Fitness Hub
+          Welcome! Ready to achieve your goals?
         </Typography>
 
         <Grid container spacing={4}>
@@ -146,7 +160,7 @@ const Dashboard: React.FC = () => {
             </Card>
           </Grid>
 
-          {/* Health Tips Section */}
+          {/* Gym Promotions Section */}
           <Grid item xs={12} md={6}>
             <Card sx={{ boxShadow: 3, borderRadius: 2 }}>
               <CardContent>
@@ -156,22 +170,27 @@ const Dashboard: React.FC = () => {
                   spacing={2}
                   sx={{ marginBottom: 2 }}
                 >
-                  <HealthAndSafetyIcon
-                    sx={{ fontSize: 40, color: "#CC0033" }}
-                  />
+                  <LocalOfferIcon sx={{ fontSize: 40, color: "#CC0033" }} />
                   <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                    Health & Safety Tips
+                    Special Gym Promotions
                   </Typography>
                 </Stack>
-                <Typography>
-                  Stay hydrated, warm up before workouts, and maintain good
-                  posture to prevent injuries.
-                </Typography>
+                <Box>
+                  {promotions.map((promo, index) => (
+                    <Typography
+                      key={index}
+                      variant="body2"
+                      sx={{ marginTop: 1, color: "#555" }}
+                    >
+                      <strong>{promo.gym}:</strong> {promo.offer}
+                    </Typography>
+                  ))}
+                </Box>
               </CardContent>
             </Card>
           </Grid>
 
-          {/* Fitness Articles Section */}
+          {/* Fitness Progress Tracker Section */}
         </Grid>
       </Box>
     </Box>
