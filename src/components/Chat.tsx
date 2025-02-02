@@ -31,6 +31,7 @@ interface Message {
   senderId: string;
   receiverId: string;
   message: string;
+  chatParticipants: string[];
   timestamp: any;
 }
 
@@ -49,6 +50,7 @@ const Chat: React.FC = () => {
     const user = auth.currentUser;
     if (!user || !friendId) return;
 
+    // Query messages where the current user is a participant
     const messagesQuery = query(
       collection(db, "messages"),
       where("chatParticipants", "array-contains", user.uid),
@@ -56,24 +58,24 @@ const Chat: React.FC = () => {
     );
 
     const unsubscribe = onSnapshot(messagesQuery, (snapshot) => {
-      const newMessages = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Message[];
+      const newMessages = snapshot.docs.map((doc) => {
+        const data = doc.data() as Message;
+        return {
+          ...data,
+          id: doc.id,
+        };
+      });
 
-      // Detect if a new message has arrived and show a notification
-      if (newMessages.length > messages.length) {
-        const latestMessage = newMessages[newMessages.length - 1];
-        if (latestMessage.senderId !== auth.currentUser?.uid) {
-          showNotification(`${friendName} sent you a message`);
-        }
-      }
+      // Only filter messages once in snapshot instead of on every render
+      const filteredMessages = newMessages.filter((msg) =>
+        msg.chatParticipants.includes(friendId)
+      );
 
-      setMessages(newMessages);
+      setMessages(filteredMessages);
     });
 
     return () => unsubscribe();
-  }, [friendId, messages.length]);
+  }, [friendId]); // Remove `messages.length` from dependencies
 
   const handleSendMessage = async () => {
     const user = auth.currentUser;
@@ -87,8 +89,11 @@ const Chat: React.FC = () => {
         chatParticipants: [user.uid, friendId],
         timestamp: Timestamp.now(),
       });
+
       setNewMessage("");
-      messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      setTimeout(() => {
+        messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100); // Small delay to allow DOM update
     } catch (error) {
       console.error("Error sending message:", error);
     }
