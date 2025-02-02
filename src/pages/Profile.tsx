@@ -13,6 +13,8 @@ import {
   Avatar,
   Divider,
   Stack,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
@@ -27,6 +29,7 @@ const Profile: React.FC = () => {
   const [preferences, setPreferences] = useState<string[]>([]);
   const [preferredGym, setPreferredGym] = useState("");
   const [collegeYear, setCollegeYear] = useState("");
+  const [showSnackbar, setShowSnackbar] = useState(false);
 
   const navigate = useNavigate();
 
@@ -82,8 +85,8 @@ const Profile: React.FC = () => {
         preferredGym,
         collegeYear,
       });
-      alert("Profile updated successfully!");
-      navigate("/dashboard");
+      setShowSnackbar(true); // Show the Snackbar
+      setTimeout(() => navigate("/dashboard"), 1500); // Navigate after a delay
     }
   };
 
@@ -216,6 +219,22 @@ const Profile: React.FC = () => {
       >
         Save Profile
       </Button>
+
+      {/* Snackbar Alert */}
+      <Snackbar
+        open={showSnackbar}
+        autoHideDuration={1500}
+        onClose={() => setShowSnackbar(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setShowSnackbar(false)}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          Profile updated successfully!
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };
