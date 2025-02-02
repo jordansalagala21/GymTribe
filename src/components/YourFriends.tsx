@@ -60,7 +60,7 @@ const YourFriends: React.FC = () => {
   return (
     <Box>
       <Typography variant="h6" sx={{ marginBottom: 2 }}>
-        Your Friends
+        Your Tribe
       </Typography>
       <Grid container spacing={3}>
         {friends.map((friend) => (

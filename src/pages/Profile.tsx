@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { auth, db } from "../services/firebase";
-import { doc, getDoc, setDoc } from "firebase/firestore";
 import {
   Box,
   TextField,
@@ -12,7 +10,13 @@ import {
   Select,
   InputLabel,
   FormControl,
+  Avatar,
+  Divider,
+  Stack,
 } from "@mui/material";
+import PersonIcon from "@mui/icons-material/Person";
+import { auth, db } from "../services/firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 
 const Profile: React.FC = () => {
@@ -82,32 +86,35 @@ const Profile: React.FC = () => {
   return (
     <Box
       sx={{
-        maxWidth: 500,
+        maxWidth: 600,
         margin: "auto",
         padding: 4,
-        marginTop: 12,
+        marginTop: 10,
         boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
-        borderRadius: 2,
+        borderRadius: 4,
         backgroundColor: "#fff",
       }}
     >
-      <Typography
-        variant="h1"
-        sx={{
-          position: "absolute",
-          top: "69%",
-          left: "10%",
-          opacity: 0.1,
-          fontSize: "10rem",
-          fontWeight: "bold",
-          color: "#CC0033",
-          pointerEvents: "none",
-        }}
+      {/* Header with Avatar */}
+      <Stack
+        direction="row"
+        alignItems="center"
+        spacing={2}
+        sx={{ marginBottom: 3 }}
       >
-        GymTribe
-      </Typography>
-      <Typography variant="h4" textAlign="center" gutterBottom>
-        Edit Profile
+        <Avatar sx={{ width: 56, height: 56, backgroundColor: "#CC0033" }}>
+          <PersonIcon fontSize="large" />
+        </Avatar>
+        <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+          Edit Profile
+        </Typography>
+      </Stack>
+
+      <Divider sx={{ marginBottom: 3 }} />
+
+      {/* Personal Information Section */}
+      <Typography variant="h6" sx={{ marginBottom: 2, fontWeight: "bold" }}>
+        Personal Information
       </Typography>
 
       <TextField
@@ -127,7 +134,6 @@ const Profile: React.FC = () => {
         margin="normal"
       />
 
-      {/* College Year Selection */}
       <FormControl fullWidth sx={{ marginTop: 3 }}>
         <InputLabel>College Year</InputLabel>
         <Select
@@ -143,8 +149,12 @@ const Profile: React.FC = () => {
         </Select>
       </FormControl>
 
-      {/* Gym Selection */}
-      <FormControl fullWidth sx={{ marginTop: 3 }}>
+      {/* Gym Information Section */}
+      <Typography variant="h6" sx={{ marginTop: 4, fontWeight: "bold" }}>
+        Gym Information
+      </Typography>
+
+      <FormControl fullWidth sx={{ marginTop: 2 }}>
         <InputLabel>Preferred Gym</InputLabel>
         <Select
           value={preferredGym}
@@ -159,8 +169,8 @@ const Profile: React.FC = () => {
         </Select>
       </FormControl>
 
-      {/* Preferences */}
-      <Typography variant="h6" sx={{ marginTop: 3 }}>
+      {/* Preferences Section */}
+      <Typography variant="h6" sx={{ marginTop: 4, fontWeight: "bold" }}>
         Preferences
       </Typography>
       <Autocomplete
@@ -183,10 +193,17 @@ const Profile: React.FC = () => {
         sx={{ marginTop: 2 }}
       />
 
+      {/* Save Button */}
       <Button
         variant="contained"
         fullWidth
-        sx={{ marginTop: 4, backgroundColor: "#CC0033" }}
+        sx={{
+          marginTop: 4,
+          backgroundColor: "#CC0033",
+          padding: 1.5,
+          fontSize: "1rem",
+          fontWeight: "bold",
+        }}
         onClick={handleSaveProfile}
       >
         Save Profile
