@@ -26,30 +26,45 @@ const FriendSuggestions: React.FC = () => {
   const [sendingRequest, setSendingRequest] = useState<{
     [id: string]: boolean;
   }>({});
+  const [pendingRequests, setPendingRequests] = useState<Set<string>>(
+    new Set()
+  );
+  const [friendIds, setFriendIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const fetchSuggestions = async () => {
       const user = auth.currentUser;
       if (!user) return;
 
-      // Fetch the current user's preferences
+      // Step 1: Fetch pending friend requests
+      const requestsQuery = query(
+        collection(db, "friendRequests"),
+        where("senderId", "==", user.uid),
+        where("status", "==", "pending")
+      );
+      const requestSnapshot = await getDocs(requestsQuery);
+      const pendingIds = new Set(
+        requestSnapshot.docs.map((doc) => doc.data().receiverId)
+      );
+      setPendingRequests(pendingIds);
+
+      // Step 2: Fetch friends of the current user
+      const friendsQuery = query(
+        collection(db, "friends"),
+        where("user1Id", "==", user.uid)
+      );
+      const friendsSnapshot = await getDocs(friendsQuery);
+      const friendsIdsSet = new Set(
+        friendsSnapshot.docs.map((doc) => doc.data().user2Id)
+      );
+      setFriendIds(friendsIdsSet);
+
+      // Step 3: Fetch users with matching preferences and apply filtering
       const userDoc = await getDocs(collection(db, "profiles"));
       const currentUserPreferences = userDoc.docs
         .find((doc) => doc.id === user.uid)
         ?.data().preferences;
 
-      // Exclude users with pending or accepted friend requests
-      const requestsQuery = query(
-        collection(db, "friendRequests"),
-        where("senderId", "==", user.uid),
-        where("status", "in", ["pending", "accepted"])
-      );
-      const requestSnapshot = await getDocs(requestsQuery);
-      const excludedIds = requestSnapshot.docs.map(
-        (doc) => doc.data().receiverId
-      );
-
-      // Query users with matching preferences and filter out excluded IDs
       const userQuery = query(
         collection(db, "profiles"),
         where("preferences", "array-contains-any", currentUserPreferences)
@@ -57,7 +72,7 @@ const FriendSuggestions: React.FC = () => {
       const suggestionSnapshot = await getDocs(userQuery);
 
       const suggestedUsers = suggestionSnapshot.docs
-        .filter((doc) => !excludedIds.includes(doc.id) && doc.id !== user.uid)
+        .filter((doc) => !friendsIdsSet.has(doc.id) && doc.id !== user.uid) // Exclude friends and the current user
         .map((doc) => ({ id: doc.id, ...doc.data() })) as User[];
 
       setSuggestions(suggestedUsers);
@@ -79,7 +94,9 @@ const FriendSuggestions: React.FC = () => {
         status: "pending",
         createdAt: new Date(),
       });
-      alert("Friend request sent!");
+
+      // Add the receiver ID to the pendingRequests set
+      setPendingRequests((prev) => new Set(prev).add(receiverId));
     } catch (error) {
       console.error("Error sending friend request:", error);
     } finally {
@@ -129,15 +146,23 @@ const FriendSuggestions: React.FC = () => {
                   Preferences: {user.preferences.join(", ")}
                 </Typography>
               </CardContent>
-              <Button
-                variant="outlined"
-                startIcon={<PersonAddIcon />}
-                sx={{ borderColor: "#CC0033", color: "#CC0033" }}
-                onClick={() => handleSendFriendRequest(user.id)}
-                disabled={sendingRequest[user.id]}
-              >
-                {sendingRequest[user.id] ? "Sending..." : "Add Friend"}
-              </Button>
+
+              {/* Display Pending or Add Friend button */}
+              {pendingRequests.has(user.id) ? (
+                <Button variant="outlined" disabled>
+                  Pending
+                </Button>
+              ) : (
+                <Button
+                  variant="outlined"
+                  startIcon={<PersonAddIcon />}
+                  sx={{ borderColor: "#CC0033", color: "#CC0033" }}
+                  onClick={() => handleSendFriendRequest(user.id)}
+                  disabled={sendingRequest[user.id]}
+                >
+                  {sendingRequest[user.id] ? "Sending..." : "Add Friend"}
+                </Button>
+              )}
             </Card>
           </Grid>
         ))}
