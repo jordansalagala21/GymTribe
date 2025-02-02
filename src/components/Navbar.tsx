@@ -49,9 +49,18 @@ const Navbar: React.FC<NavbarProps> = ({ title }) => {
       }}
     >
       <Toolbar sx={{ justifyContent: "space-between", minHeight: "48px" }}>
-        <Typography variant="h4" sx={{ color: "#CC0033", fontWeight: "bold" }}>
+        {/* Title with custom font */}
+        <Typography
+          variant="h4"
+          sx={{
+            color: "#CC0033",
+            fontWeight: "bold",
+            fontFamily: "'IM Fell French Canon SC', serif",
+          }}
+        >
           {title}
         </Typography>
+
         <Box sx={{ display: "flex", alignItems: "center" }}>
           {/* Friend Requests Notification */}
           <FriendRequests />

@@ -77,7 +77,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <Box sx={{ minHeight: "100vh", backgroundColor: "#f9f9f9" }}>
-      <Navbar title="R GymTribe" />
+      <Navbar title="GymTribe" />
 
       {/* Notification Snackbar */}
       <Snackbar
