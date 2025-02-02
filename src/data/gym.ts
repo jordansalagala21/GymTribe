@@ -49,7 +49,6 @@ export const gyms = [
         "Fitness & Wellness Classes",
         "Indoor Rockwall",
         "Open Swim & Lap Swim",
-        "Outdoor Tennis/Basketball Courts",
         "Sand Volleyball",
       ],
     },

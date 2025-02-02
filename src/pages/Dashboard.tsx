@@ -22,6 +22,7 @@ import Navbar from "../components/Navbar";
 import GymList from "../components/GymList";
 import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
+import HealthAndSafetyIcon from "@mui/icons-material/HealthAndSafety";
 import YourFriends from "../components/YourFriends";
 import FriendSuggestions from "../components/FriendSuggestions";
 import { useNavigate } from "react-router-dom";
@@ -98,6 +99,7 @@ const Dashboard: React.FC = () => {
         </Typography>
 
         <Grid container spacing={4}>
+          {/* Explore Gyms Section */}
           <Grid item xs={12} md={6}>
             <Card sx={{ boxShadow: 3, borderRadius: 2 }}>
               <CardContent>
@@ -143,6 +145,33 @@ const Dashboard: React.FC = () => {
               </CardContent>
             </Card>
           </Grid>
+
+          {/* Health Tips Section */}
+          <Grid item xs={12} md={6}>
+            <Card sx={{ boxShadow: 3, borderRadius: 2 }}>
+              <CardContent>
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  spacing={2}
+                  sx={{ marginBottom: 2 }}
+                >
+                  <HealthAndSafetyIcon
+                    sx={{ fontSize: 40, color: "#CC0033" }}
+                  />
+                  <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                    Health & Safety Tips
+                  </Typography>
+                </Stack>
+                <Typography>
+                  Stay hydrated, warm up before workouts, and maintain good
+                  posture to prevent injuries.
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+
+          {/* Fitness Articles Section */}
         </Grid>
       </Box>
     </Box>
