@@ -3,7 +3,28 @@ import { useNavigate, Link } from "react-router-dom";
 import { auth, db } from "../services/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
-import { TextField, Button, Typography, Box } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Typography,
+  Box,
+  Paper,
+  Avatar,
+} from "@mui/material";
+import PeopleIcon from "@mui/icons-material/People";
+import { keyframes } from "@emotion/react";
+
+// Fade-in animation
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
 
 const Register: React.FC = () => {
   const [name, setName] = useState("");
@@ -30,94 +51,124 @@ const Register: React.FC = () => {
         email,
       });
 
-      navigate("/dashboard"); // Redirect to preferences after registration
+      navigate("/dashboard"); // Redirect to dashboard on success
     } catch (err) {
-      setError((err as Error).message);
+      setError("Registration failed. Please try again.");
     }
   };
 
   return (
-    <Box>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        background: "linear-gradient(to right, #FFDEE9, #B5FFFC)",
+        padding: 3,
+        position: "relative",
+      }}
+    >
+      {/* Watermark */}
       <Typography
-        variant="h4"
-        align="center"
-        fontFamily={"Roboto, sans-serif"}
-        sx={{ marginBottom: 4, marginTop: 8, color: "#CC0033" }}
-      >
-        Join us and find like-minded gym buddies!
-      </Typography>
-      <Box
+        variant="h1"
         sx={{
-          maxWidth: 400,
-          margin: "auto",
-          padding: 4,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
-          borderRadius: 2,
-          backgroundColor: "#fff",
+          position: "absolute",
+          top: "5%",
+          left: "5%",
+          opacity: 0.05,
+          fontSize: "12rem",
+          fontWeight: "bold",
+          color: "#CC0033",
+          pointerEvents: "none",
         }}
       >
-        <Typography variant="h4" gutterBottom>
-          Create Your Account
-        </Typography>
+        GymTribe
+      </Typography>
+
+      {/* Registration Form */}
+      <Paper
+        elevation={6}
+        sx={{
+          padding: 4,
+          borderRadius: 3,
+          width: 400,
+          animation: `${fadeIn} 1s ease-out`,
+        }}
+      >
+        <Box sx={{ textAlign: "center", marginBottom: 3 }}>
+          <Avatar
+            sx={{
+              bgcolor: "#CC0033",
+              width: 64,
+              height: 64,
+              margin: "0 auto",
+              marginBottom: 2,
+            }}
+          >
+            <PeopleIcon fontSize="large" />
+          </Avatar>
+          <Typography variant="h4" fontWeight="bold">
+            Create Your Account
+          </Typography>
+          <Typography variant="body1" sx={{ marginTop: 1 }}>
+            Join us and find like-minded gym buddies!
+          </Typography>
+        </Box>
 
         <form onSubmit={handleRegister} style={{ width: "100%" }}>
           {/* Name Field */}
-          <Typography sx={{ marginBottom: 1 }}>Your Full Name</Typography>
           <TextField
             fullWidth
-            placeholder="Enter your name"
+            label="Full Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            margin="none"
+            margin="normal"
+            required
           />
 
           {/* Age Field */}
-          <Typography sx={{ marginBottom: 1, marginTop: 3 }}>
-            Your Age
-          </Typography>
           <TextField
             fullWidth
-            placeholder="Enter your age"
+            label="Age"
             type="number"
             value={age}
             onChange={(e) => setAge(e.target.value)}
-            margin="none"
+            margin="normal"
+            required
           />
 
           {/* Email Field */}
-          <Typography sx={{ marginBottom: 1, marginTop: 3 }}>
-            Email Address
-          </Typography>
           <TextField
             fullWidth
-            placeholder="Enter your email"
+            label="Email Address"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            margin="none"
+            margin="normal"
+            required
           />
 
           {/* Password Field */}
-          <Typography sx={{ marginBottom: 1, marginTop: 3 }}>
-            Password
-          </Typography>
           <TextField
             fullWidth
-            placeholder="Create a password"
+            label="Password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            margin="none"
+            margin="normal"
+            required
           />
 
           {/* Error Message */}
           {error && (
             <Typography
               color="error"
-              sx={{ marginTop: 2, textAlign: "center" }}
+              sx={{
+                marginTop: 2,
+                textAlign: "center",
+                animation: `${fadeIn} 0.5s ease-out`,
+              }}
             >
               {error}
             </Typography>
@@ -128,7 +179,12 @@ const Register: React.FC = () => {
             type="submit"
             variant="contained"
             fullWidth
-            sx={{ marginTop: 4, backgroundColor: "#CC0033" }}
+            sx={{
+              marginTop: 4,
+              backgroundColor: "#CC0033",
+              color: "#FFFFFF",
+              "&:hover": { backgroundColor: "#AA0029" },
+            }}
           >
             Register
           </Button>
@@ -136,9 +192,12 @@ const Register: React.FC = () => {
 
         {/* Already Registered Link */}
         <Typography sx={{ marginTop: 3, textAlign: "center" }}>
-          Already registered? <Link to="/login">Login here</Link>
+          Already registered?{" "}
+          <Link to="/login" style={{ color: "#CC0033", fontWeight: "bold" }}>
+            Login here
+          </Link>
         </Typography>
-      </Box>
+      </Paper>
     </Box>
   );
 };
