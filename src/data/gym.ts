@@ -25,6 +25,7 @@ export const gyms = [
         "Intramurals / Sport Clubs",
         "Massage Therapy",
         "Open Swim & Lap Swim",
+        "Gym Annex",
       ],
     },
     {
