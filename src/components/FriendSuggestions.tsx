@@ -106,6 +106,17 @@ const FriendSuggestions: React.FC = () => {
 
   return (
     <Box>
+      {suggestions.length === 0 && (
+        <Typography
+          variant="body1"
+          color="#CC0033"
+          textAlign="center"
+          sx={{ marginTop: 3 }}
+        >
+          No suggestions available at the moment. Make sure to add your
+          preferences in the profile section!
+        </Typography>
+      )}
       <Grid container spacing={3}>
         {suggestions.map((user) => (
           <Grid item xs={12} key={user.id}>
