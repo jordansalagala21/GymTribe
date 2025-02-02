@@ -20,6 +20,8 @@ const Profile: React.FC = () => {
   const [age, setAge] = useState("");
   const [preferences, setPreferences] = useState<string[]>([]);
   const [preferredGym, setPreferredGym] = useState("");
+  const [collegeYear, setCollegeYear] = useState("");
+
   const navigate = useNavigate();
 
   const options = [
@@ -41,6 +43,8 @@ const Profile: React.FC = () => {
     "Werblin Recreation Center",
   ];
 
+  const collegeYears = ["Freshman", "Sophomore", "Junior", "Senior"];
+
   useEffect(() => {
     const fetchProfileData = async () => {
       const user = auth.currentUser;
@@ -53,6 +57,7 @@ const Profile: React.FC = () => {
           setAge(data.age || "");
           setPreferences(data.preferences || []);
           setPreferredGym(data.preferredGym || "");
+          setCollegeYear(data.collegeYear || "");
         }
       }
     };
@@ -67,6 +72,7 @@ const Profile: React.FC = () => {
         age,
         preferences,
         preferredGym,
+        collegeYear,
       });
       alert("Profile updated successfully!");
       navigate("/dashboard");
@@ -120,6 +126,22 @@ const Profile: React.FC = () => {
         onChange={(e) => setAge(e.target.value)}
         margin="normal"
       />
+
+      {/* College Year Selection */}
+      <FormControl fullWidth sx={{ marginTop: 3 }}>
+        <InputLabel>College Year</InputLabel>
+        <Select
+          value={collegeYear}
+          onChange={(e) => setCollegeYear(e.target.value)}
+          label="College Year"
+        >
+          {collegeYears.map((year, index) => (
+            <MenuItem key={index} value={year}>
+              {year}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
 
       {/* Gym Selection */}
       <FormControl fullWidth sx={{ marginTop: 3 }}>
