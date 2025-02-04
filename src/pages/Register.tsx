@@ -32,10 +32,22 @@ const Register: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [emailError, setEmailError] = useState(""); // Email validation error state
   const navigate = useNavigate();
+
+  // Function to validate email format
+  const isValidEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isValidEmail(email)) {
+      setEmailError("Please enter a valid email address.");
+      return;
+    }
+
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -138,14 +150,23 @@ const Register: React.FC = () => {
             required
           />
 
-          {/* Email Field */}
+          {/* Email Field with Validation */}
           <TextField
             fullWidth
             label="Email Address"
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (!isValidEmail(e.target.value)) {
+                setEmailError("Please enter a valid email address.");
+              } else {
+                setEmailError("");
+              }
+            }}
             margin="normal"
+            error={!!emailError}
+            helperText={emailError}
             required
           />
 
