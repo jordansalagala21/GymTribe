@@ -31,7 +31,7 @@ const FriendSuggestions: React.FC = () => {
   const [pendingRequests, setPendingRequests] = useState<Set<string>>(
     new Set()
   );
-  const [friendIds, setFriendIds] = useState<Set<string>>(new Set());
+  const [, setFriendIds] = useState<Set<string>>(new Set());
   const [currentUserPreferences, setCurrentUserPreferences] = useState<
     string[]
   >([]);
