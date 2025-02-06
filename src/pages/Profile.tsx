@@ -336,7 +336,7 @@ const Profile: React.FC = () => {
         <DialogContent>
           <DialogContentText>
             Are you sure you want to delete your account? This action cannot be
-            undone.
+            undone. Your profile and all associated data will be permanently!
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -363,7 +363,7 @@ const Profile: React.FC = () => {
           severity="success"
           sx={{ width: "100%" }}
         >
-          Profile updated successfully! Taking you back in 3s!
+          Profile updated successfully! Taking you back in 3s...!
         </Alert>
       </Snackbar>
     </Box>

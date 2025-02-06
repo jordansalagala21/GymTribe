@@ -19,6 +19,7 @@ interface User {
   name: string;
   preferences: string[];
   collegeYear: string;
+  photoURL?: string;
 }
 
 const FriendSuggestions: React.FC = () => {
@@ -126,6 +127,11 @@ const FriendSuggestions: React.FC = () => {
                 alignItems: "center",
                 boxShadow: 2,
                 padding: 2,
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  boxShadow: 6,
+                  backgroundColor: "#f7f7f7",
+                },
               }}
             >
               <Avatar
@@ -135,8 +141,10 @@ const FriendSuggestions: React.FC = () => {
                   backgroundColor: "#CC0033",
                   marginRight: 2,
                 }}
+                src={user.photoURL}
+                alt={user.name}
               >
-                {user.name.charAt(0).toUpperCase()}
+                {!user.photoURL && user.name.charAt(0).toUpperCase()}
               </Avatar>
               <CardContent sx={{ flexGrow: 1 }}>
                 <Typography variant="h6" sx={{ fontWeight: "bold" }}>

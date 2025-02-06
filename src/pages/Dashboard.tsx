@@ -104,14 +104,6 @@ const Dashboard: React.FC = () => {
       </Snackbar>
 
       <Box sx={{ padding: 4 }}>
-        {/* Personalized Greeting */}
-        <Typography
-          variant="h4"
-          sx={{ marginBottom: 4, textAlign: "center", fontWeight: "bold" }}
-        >
-          Welcome! Ready to achieve your goals?
-        </Typography>
-
         <Grid container spacing={4}>
           {/* Explore Gyms Section */}
           <Grid item xs={12} md={6}>
