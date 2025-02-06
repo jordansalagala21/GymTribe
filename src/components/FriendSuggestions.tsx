@@ -19,6 +19,7 @@ interface User {
   name: string;
   preferences: string[];
   collegeYear: string;
+  bio?: string;
   photoURL?: string;
 }
 
@@ -31,6 +32,9 @@ const FriendSuggestions: React.FC = () => {
     new Set()
   );
   const [friendIds, setFriendIds] = useState<Set<string>>(new Set());
+  const [currentUserPreferences, setCurrentUserPreferences] = useState<
+    string[]
+  >([]);
 
   useEffect(() => {
     const fetchSuggestions = async () => {
@@ -60,15 +64,18 @@ const FriendSuggestions: React.FC = () => {
       );
       setFriendIds(friendsIdsSet);
 
-      // Step 3: Fetch users with matching preferences and apply filtering
+      // Step 3: Fetch current user's preferences
       const userDoc = await getDocs(collection(db, "profiles"));
-      const currentUserPreferences = userDoc.docs
+      const userProfile = userDoc.docs
         .find((doc) => doc.id === user.uid)
-        ?.data().preferences;
+        ?.data();
+      const userPreferences = userProfile?.preferences || [];
+      setCurrentUserPreferences(userPreferences);
 
+      // Step 4: Fetch suggestions and filter
       const userQuery = query(
         collection(db, "profiles"),
-        where("preferences", "array-contains-any", currentUserPreferences)
+        where("preferences", "array-contains-any", userPreferences)
       );
       const suggestionSnapshot = await getDocs(userQuery);
 
@@ -81,6 +88,17 @@ const FriendSuggestions: React.FC = () => {
 
     fetchSuggestions();
   }, []);
+
+  const calculateMatchRate = (userPreferences: string[]): number => {
+    if (!currentUserPreferences.length) return 0;
+
+    const matchedPreferences = userPreferences.filter((pref) =>
+      currentUserPreferences.includes(pref)
+    );
+    return Math.round(
+      (matchedPreferences.length / currentUserPreferences.length) * 100
+    );
+  };
 
   const handleSendFriendRequest = async (receiverId: string) => {
     const user = auth.currentUser;
@@ -119,72 +137,85 @@ const FriendSuggestions: React.FC = () => {
         </Typography>
       )}
       <Grid container spacing={3}>
-        {suggestions.map((user) => (
-          <Grid item xs={12} key={user.id}>
-            <Card
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                boxShadow: 2,
-                padding: 2,
-                transition: "all 0.3s ease",
-                "&:hover": {
-                  boxShadow: 6,
-                  backgroundColor: "#f7f7f7",
-                },
-              }}
-            >
-              <Avatar
-                sx={{
-                  width: 56,
-                  height: 56,
-                  backgroundColor: "#CC0033",
-                  marginRight: 2,
-                }}
-                src={user.photoURL}
-                alt={user.name}
-              >
-                {!user.photoURL && user.name.charAt(0).toUpperCase()}
-              </Avatar>
-              <CardContent sx={{ flexGrow: 1 }}>
-                <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                  {user.name}
-                </Typography>
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  spacing={1}
-                  sx={{ marginTop: 1 }}
-                >
-                  <SchoolIcon sx={{ color: "#757575" }} />
-                  <Typography variant="body2" color="textSecondary">
-                    {user.collegeYear}
-                  </Typography>
-                </Stack>
-                <Typography variant="body2" sx={{ marginTop: 1 }}>
-                  Preferences: {user.preferences.join(", ")}
-                </Typography>
-              </CardContent>
+        {suggestions.map((user) => {
+          const matchRate = calculateMatchRate(user.preferences);
 
-              {/* Display Pending or Add Friend button */}
-              {pendingRequests.has(user.id) ? (
-                <Button variant="outlined" disabled>
-                  Pending
-                </Button>
-              ) : (
-                <Button
-                  variant="outlined"
-                  startIcon={<PersonAddIcon />}
-                  sx={{ borderColor: "#CC0033", color: "#CC0033" }}
-                  onClick={() => handleSendFriendRequest(user.id)}
-                  disabled={sendingRequest[user.id]}
+          return (
+            <Grid item xs={12} key={user.id}>
+              <Card
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  boxShadow: 2,
+                  padding: 2,
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    boxShadow: 6,
+                    backgroundColor: "#f7f7f7",
+                  },
+                }}
+              >
+                <Avatar
+                  sx={{
+                    width: 56,
+                    height: 56,
+                    backgroundColor: "#CC0033",
+                    marginRight: 2,
+                  }}
+                  src={user.photoURL}
+                  alt={user.name}
                 >
-                  {sendingRequest[user.id] ? "Sending..." : "Add Friend"}
-                </Button>
-              )}
-            </Card>
-          </Grid>
-        ))}
+                  {!user.photoURL && user.name.charAt(0).toUpperCase()}
+                </Avatar>
+                <CardContent sx={{ flexGrow: 1 }}>
+                  <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                    {user.name}
+                  </Typography>
+                  <Typography variant="body2" sx={{ fontStyle: "italic" }}>
+                    {user.bio || "No bio available"}
+                  </Typography>
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    spacing={1}
+                    sx={{ marginTop: 1 }}
+                  >
+                    <SchoolIcon sx={{ color: "#757575" }} />
+                    <Typography variant="body2" color="textSecondary">
+                      {user.collegeYear}
+                    </Typography>
+                  </Stack>
+                  <Typography variant="body2" sx={{ marginTop: 1 }}>
+                    Preferences: {user.preferences.join(", ")}
+                  </Typography>
+                  <Typography
+                    variant="body2"
+                    sx={{ marginTop: 1, fontWeight: "bold", color: "#CC0033" }}
+                  >
+                    Match Rate: {matchRate}%
+                  </Typography>
+                </CardContent>
+
+                {/* Display Pending or Add Friend button */}
+                {pendingRequests.has(user.id) ? (
+                  <Button variant="outlined" disabled>
+                    Pending
+                  </Button>
+                ) : (
+                  <Button
+                    variant="outlined"
+                    startIcon={<PersonAddIcon />}
+                    sx={{ borderColor: "#CC0033", color: "#CC0033" }}
+                    onClick={() => handleSendFriendRequest(user.id)}
+                    disabled={sendingRequest[user.id]}
+                  >
+                    {sendingRequest[user.id] ? "Sending..." : "Add Friend"}
+                  </Button>
+                )}
+              </Card>
+            </Grid>
+          );
+        })}
       </Grid>
     </Box>
   );

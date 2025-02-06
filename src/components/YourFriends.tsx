@@ -23,6 +23,7 @@ import {
 interface Friend {
   id: string;
   name: string;
+  photoURL: string;
 }
 
 const YourFriends: React.FC = () => {
@@ -56,6 +57,7 @@ const YourFriends: React.FC = () => {
             return {
               id: friendId,
               name: friendProfile?.name || "Unknown",
+              photoURL: friendProfile?.photoURL || "", // Fetch photoURL
             };
           })
         )
@@ -90,6 +92,11 @@ const YourFriends: React.FC = () => {
                 alignItems: "center",
                 boxShadow: 2,
                 padding: 2,
+                transition: "all 0.3s ease",
+                "&:hover": {
+                  boxShadow: 6,
+                  backgroundColor: "#f7f7f7",
+                },
               }}
             >
               <Avatar
@@ -99,8 +106,10 @@ const YourFriends: React.FC = () => {
                   backgroundColor: "#3f51b5",
                   marginRight: 2,
                 }}
+                src={friend.photoURL}
+                alt={friend.name}
               >
-                {friend.name.charAt(0).toUpperCase()}
+                {!friend.photoURL && friend.name.charAt(0).toUpperCase()}
               </Avatar>
               <CardContent sx={{ flexGrow: 1 }}>
                 <Typography variant="h6" sx={{ fontWeight: "bold" }}>
