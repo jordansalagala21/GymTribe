@@ -103,11 +103,15 @@ const Chat: React.FC = () => {
     navigate("/dashboard");
   };
 
-  const showNotification = (message: string) => {
-    setNotification(message);
-    setTimeout(() => setNotification(null), 3000); // Hide notification after 3 seconds
-  };
-
+  useEffect(() => {
+    if (messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      if (lastMessage.senderId !== auth.currentUser?.uid) {
+        setNotification("New message received");
+        setTimeout(() => setNotification(null), 3000);
+      }
+    }
+  }, [messages]);
   return (
     <Box
       sx={{
